@@ -3,13 +3,14 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logout } from '../Slices/UserSlice';
+import { FaUser } from 'react-icons/fa';
 
 function Home() {
   const dispatch = useDispatch();
   const user = useSelector(state => state.user);
   const navigate = useNavigate();
   
-  // Get user data from either Redux or localStorage
+
   const userDataFromStorage = localStorage.getItem('userData');
   const userData = user.islogged ? user : (userDataFromStorage ? JSON.parse(userDataFromStorage) : null);
   
@@ -110,7 +111,10 @@ function Home() {
       {/* Header */}
       <header className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+
           <h1 className="text-2xl font-bold text-gray-800">Groom Net</h1>
+          <h1>Home Page</h1>
+          <FaUser style={{ cursor: 'pointer' }} size={24} onClick={() => navigate('/profile')} />
           <button 
             onClick={handleLogout}
             className="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-md transition duration-300"

@@ -13,11 +13,11 @@ export function useAuth() {
       const response = await axios.post('http://127.0.0.1:8000/login/', { 
         email, 
         password,
-        user_type: userType // Send user type to backend for verification (optional)
+        user_type: userType 
       });
       const data = response.data;
       
-      // Store tokens and user data in localStorage
+      
       localStorage.setItem('accessToken', data.access);
       localStorage.setItem('refreshToken', data.refresh);
       localStorage.setItem('userData', JSON.stringify(data.user));
@@ -40,11 +40,9 @@ export function useAuth() {
 
   const handleRegister = async (userData) => {
     try {
-      // Map user types to their corresponding registration endpoints
       const endpoints = {
         barber: 'http://127.0.0.1:8000/register/barber/',
-        admin: 'http://127.0.0.1:8000/register/admin/',
-        customer: 'http://127.0.0.1:8000/register/user/', // Maps customer to user endpoint
+        customer: 'http://127.0.0.1:8000/register/user/', 
       };
   
       const endpoint = endpoints[userData.user_type];
@@ -52,28 +50,25 @@ export function useAuth() {
         throw new Error('Invalid user type!');
       }
   
-      // Make a copy of userData to modify
+      
       const payload = {
         ...userData,
-        confirm_password: userData.confirmPassword || userData.password, // Fix for confirmPassword field name
+        confirm_password: userData.confirmPassword || userData.password, 
       };
   
-      // Remove confirmPassword if it exists (as it's not expected by the backend)
       if (payload.confirmPassword) {
         delete payload.confirmPassword;
       }
   
       const response = await axios.post(endpoint, payload);
   
-      // Dispatch register action
+  
       dispatch(registerAction({
         name: response.data.name || userData.name,
         email: response.data.email || userData.email,
         phone: response.data.phone || userData.phone || '',
         userType: response.data.user_type || userData.user_type,
       }));
-  
-      // Navigate to login page specific to user type
       navigate(`/login/${userData.user_type}`);
   
       return { success: true, message: 'Registration successful! Please login.' };

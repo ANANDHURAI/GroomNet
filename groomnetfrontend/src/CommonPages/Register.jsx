@@ -1,4 +1,3 @@
-"use client"
 
 import { useState, useEffect } from "react"
 import { Link, useParams, useNavigate } from "react-router-dom"
@@ -13,7 +12,6 @@ function Register() {
   const { handleRegister } = useAuth()
   const [message, setMessage] = useState({ type: "", text: "" })
 
-  // Validate user type is valid, otherwise redirect to landing
   useEffect(() => {
     const validTypes = ["customer", "barber", "admin"]
     if (!validTypes.includes(userType)) {
@@ -22,21 +20,38 @@ function Register() {
   }, [userType, navigate])
 
   const validationSchema = Yup.object({
-    name: Yup.string().required("Name is required"),
-    email: Yup.string().email("Invalid email address").required("Email is required"),
-    password: Yup.string().required("Password is required"),
+    name: Yup.string()
+      .min(5, "Name must be at least 5 characters")
+      .max(20, "Name must not exceed 20 characters")
+      .matches(/^[a-zA-Z\s]+$/, "Name can only contain letters and spaces")
+      .required("Name is required"),
+    
+    email: Yup.string()
+      .email("Enter a valid email address")
+      .required("Email is required"),
+    
+    password: Yup.string()
+      .min(8, "Password must be at least 8 characters")
+      .max(30, "Password must not exceed 30 characters")
+      .matches(
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+        "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character"
+      )
+      .required("Password is required"),
+    
     confirmPassword: Yup.string()
-      .oneOf([Yup.ref("password"), null], "Passwords must match")
+      .oneOf([Yup.ref("password"), null], "Password doesn't match")
       .required("Confirm Password is required"),
-    phone: Yup.string().matches(/^\d{10}$/, "Phone number must be 10 digits"),
+    
+    phone: Yup.string()
+      .required("Phone number is required")
+      .matches(/^[6-9]\d{9}$/, "Enter a valid 10-digit Indian mobile number"),
   })
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
-      // Extract confirmPassword and prepare userData
       const { confirmPassword, ...userData } = values
 
-      // Add confirm_password field that backend expects
       userData.confirm_password = confirmPassword
       userData.user_type = userType
 
@@ -58,12 +73,12 @@ function Register() {
     setSubmitting(false)
   }
 
-  // Helper function to format user type for display
+
   const formatUserType = (type) => {
     return type.charAt(0).toUpperCase() + type.slice(1)
   }
 
-  // Additional fields based on user type
+  
   const renderAdditionalFields = () => {
     if (userType === "barber") {
       return (
@@ -108,6 +123,8 @@ function Register() {
             }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
+            validateOnBlur={true}
+            validateOnChange={false} // Only validate after input loses focus
           >
             {({ isSubmitting }) => (
               <Form className="space-y-5">
