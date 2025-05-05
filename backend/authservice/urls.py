@@ -1,8 +1,18 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import HomeView, RegisterView, LogoutView , VerifyOTPView
+from .views import(
+    HomeView, 
+    RegisterView,
+    LogoutView ,
+    VerifyOTPView ,
+    AdminDashboardView , 
+    AdminLoginView ,
+    RegisterView, 
+    CreateUserView,
+    ResendOTPView ,
+    GetCSRFToken
+)
 from .serializers import CustomTokenObtainPairSerializer
-from rest_framework_simplejwt.views import TokenObtainPairView
 
 class CustomTokenView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
@@ -15,4 +25,11 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('verify-otp/', VerifyOTPView.as_view(), name='verify_otp'),
+    path('create-user/', CreateUserView.as_view(), name='create_user'),
+    path('resend-otp/', ResendOTPView.as_view(), name='resend_otp'),
+
+    path('aadmin/login/', AdminLoginView.as_view(), name='admin_login'),
+    path('get-csrf-token/', GetCSRFToken.as_view(), name='get-csrf-token'),
+    path('admin/dashboard/', AdminDashboardView.as_view(), name='admin_dashboard'),
+    
 ]

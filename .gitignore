@@ -1,0 +1,12 @@
+# Ignore virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# SQLite DB
+*.sqlite3
+
+# Environment variables
+.env
