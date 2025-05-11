@@ -301,8 +301,6 @@ class AdminDashboardView(APIView):
             'is_superuser': request.user.is_superuser,
         })
 
-
-
     
 class CustomTokenView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
