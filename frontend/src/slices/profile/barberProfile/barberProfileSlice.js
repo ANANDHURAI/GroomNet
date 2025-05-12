@@ -1,39 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import apiClient from './authApiClient'; 
-
-export const fetchBarberProfile = createAsyncThunk(
-  'barberProfile/fetch',
-  async (_, { rejectWithValue }) => {
-    try {
-      const response = await apiClient.get('/profile/barber/profile/');
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || 'Failed to fetch profile'
-      );
-    }
-  }
-);
-
-export const updateBarberProfile = createAsyncThunk(
-  'barberProfile/update',
-  async (formData, { rejectWithValue }) => {
-    try {
-      const config = {
-        headers: {
-          'Content-Type': formData instanceof FormData ? 'multipart/form-data' : 'application/json',
-        },
-      };
-      
-      const response = await apiClient.patch('/profile/barber/profile/', formData, config);
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.error || 'Failed to update profile'
-      );
-    }
-  }
-);
+import { createSlice } from '@reduxjs/toolkit';
+import fetchBarberProfile from './fetchBarberProfile';
+import updateBarberProfile from './updateBarberProfile';
 
 const barberProfileSlice = createSlice({
   name: 'barberProfile',
@@ -61,7 +28,6 @@ const barberProfileSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
       .addCase(updateBarberProfile.pending, (state) => {
         state.loading = true;
         state.error = null;

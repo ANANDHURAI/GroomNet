@@ -8,6 +8,10 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import Home from './pages/common/Home';
 import RegisterPage from './pages/authpages/RegisterPage';
 import OtpVerifyPage from './pages/authpages/Otpverifypage';
+import BarberHome from './pages/barber/BarberHome';
+import BarberProfilePage from './pages/profile/BarberProfilePage';
+import CustomerProfilePage from './pages/profile/CustomerProfilePage';
+import AdminProfilePage from './pages/profile/AdminProfilePage';
 
 function App() {
   const dispatch = useDispatch();
@@ -19,20 +23,27 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-  
+        {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/aadmin/login" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/otp" element={<OtpVerifyPage />} />
         
-       
+        {/* Default Route */}
         <Route path="/" element={<Navigate to="/home" replace />} />
     
+        {/* Main Routes */}
         <Route path="/home" element={<Home />} />
-       
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="*" element={<Navigate to="/home" replace />} />
+        <Route path="/barber/home" element={<BarberHome />} />
         
+        {/* Profile Routes */}
+        <Route path="/profile/customer" element={<CustomerProfilePage />} />
+        <Route path="/profile/barber" element={<BarberProfilePage />} />
+        <Route path="/profile/admin" element={<AdminProfilePage />} />
+        
+        {/* Catch All Route */}
+        <Route path="*" element={<Navigate to="/home" replace />} />
       </Routes>
     </BrowserRouter>
   );

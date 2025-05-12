@@ -1,6 +1,8 @@
 import axios from 'axios'
 import React, { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useDispatch } from 'react-redux'
+import { register } from '../../slices/authSlices/authRegisterSlice'
 
 function RegisterPage() {
     const [name, setName] = useState('')
@@ -10,15 +12,17 @@ function RegisterPage() {
     const [confirmPassword, setConfirmPassword] = useState('')
     const [error, setError] = useState('')
     const [loading, setLoading] = useState(false)
-    const [userType, setUserType] = useState('Customer') 
+    const [userType, setUserType] = useState('customer') 
     
     const navigate = useNavigate()
+    const dispatch = useDispatch()
 
     const handleSubmit = async (e) => {
         e.preventDefault()
         setLoading(true)
         setError('')
 
+        // Front-end validations
         if (password !== confirmPassword) {
             setError('Passwords do not match')
             setLoading(false)
@@ -39,17 +43,15 @@ function RegisterPage() {
         }
 
         try {
-        
             const registrationData = { 
                 name, 
                 email, 
                 phone, 
                 password, 
-                user_type: userType
+                user_type: userType.toLowerCase()
             }
             
-            console.log("Submitting registration data:", registrationData)
-            
+            // Request OTP
             const { data } = await axios.post(
                 "http://localhost:8000/register/",
                 registrationData,
@@ -60,19 +62,22 @@ function RegisterPage() {
                 }
             )
             
-            console.log("Registration response:", data)
-            
+            // Store pending registration data in session storage
             sessionStorage.setItem("pendingRegistration", JSON.stringify(registrationData))
 
-            alert(data.message || "OTP sent to your email. Please verify.")
-            
+            // Dispatch action to update register state
+            dispatch(register({
+                name,
+                email,
+                phone,
+                userType: userType.toLowerCase()
+            }))
+
             navigate("/otp", { state: { email } })
         } catch (err) {
             console.error("Registration error:", err)
             
             if (err.response && err.response.data) {
-                console.log("Error details:", err.response.data)
-                
                 if (err.response.data.details) {
                     setError(
                         Object.entries(err.response.data.details)
@@ -98,7 +103,7 @@ function RegisterPage() {
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <div className="bg-white p-8 rounded-lg shadow-md w-96">
-                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">{userType} Register</h2>
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">{userType.charAt(0).toUpperCase() + userType.slice(1)} Register</h2>
                 
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 whitespace-pre-line">
@@ -162,8 +167,8 @@ function RegisterPage() {
                             value={userType}
                             onChange={(e) => setUserType(e.target.value)}
                         >
-                            <option value="Customer">Customer</option>
-                            <option value="Barber">Barber</option>
+                            <option value="customer">Customer</option>
+                            <option value="barber">Barber</option>
                         </select>
                     </div>
                     

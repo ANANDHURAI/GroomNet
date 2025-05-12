@@ -2,7 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { authLoginSlice } from "../../slices/authSlices/authLoginSlice";
+import { login } from "../../slices/authSlices/authLoginSlice";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,8 +18,6 @@ const Login = () => {
     setLoading(true);
     
     try {
-      console.log("Attempting login with:", { email });
-      
       const { data } = await axios.post(
         "http://localhost:8000/token/",
         { email, password },
@@ -29,16 +28,16 @@ const Login = () => {
         }
       );
 
-      console.log("Login successful, received data:", data);
-     
+      // Store tokens
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("refresh_token", data.refresh);
 
+      // Update axios default headers
       axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
       
-     
+      // Dispatch login action
       dispatch(
-        authLoginSlice({
+        login({
           name: data.name,
           email: data.email,
           userType: data.user_type,
@@ -48,7 +47,7 @@ const Login = () => {
         })
       );
       
-     
+      // Store user info in local storage
       localStorage.setItem('user', JSON.stringify({
         name: data.name,
         email: data.email,
@@ -59,8 +58,17 @@ const Login = () => {
         islogged: true
       }));
       
-      
-      navigate("/home");
+      // Redirect based on user type
+      switch(data.user_type) {
+        case 'admin':
+          navigate("/admin/dashboard");
+          break;
+        case 'barber':
+          navigate("/barber/dashboard");
+          break;
+        default:
+          navigate("/home");
+      }
     } catch (err) {
       console.error("Login error:", err);
       setError(

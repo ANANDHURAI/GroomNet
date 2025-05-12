@@ -2,8 +2,7 @@ import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { authRegisterSlice } from '../../slices/authSlices/authRegisterSlice'
-
+import { login } from '../../slices/authSlices/authLoginSlice'
 
 function OtpVerifyPage() {
     const [otp, setOtp] = useState('')
@@ -29,9 +28,8 @@ function OtpVerifyPage() {
         setSuccess('')
         
         try {
-            console.log("Verifying OTP for:", email)
-            
-            const verifyResponse = await axios.post(
+            // Verify OTP
+            await axios.post(
                 "http://localhost:8000/verify-otp/", 
                 { email, otp },
                 {
@@ -41,9 +39,7 @@ function OtpVerifyPage() {
                 }
             )
             
-            console.log("OTP verification response:", verifyResponse.data)
-            setSuccess("OTP verified successfully!")
-            
+            // Get the pending registration data
             const pendingRegistration = JSON.parse(sessionStorage.getItem("pendingRegistration"))
             
             if (!pendingRegistration) {
@@ -52,17 +48,13 @@ function OtpVerifyPage() {
                 return
             }
             
-            const userData = {
-                ...pendingRegistration,
-                email, 
-                user_type: pendingRegistration.user_type 
-            }
-            
-            console.log("Creating user with data:", userData)
-            
+            // Create user
             const { data } = await axios.post(
                 "http://localhost:8000/create-user/",
-                userData,
+                {
+                    ...pendingRegistration,
+                    email
+                },
                 {
                     headers: {
                         "Content-Type": "application/json",
@@ -70,44 +62,54 @@ function OtpVerifyPage() {
                 }
             )
             
-            console.log("User creation response:", data)
-            
+            // Store tokens
             localStorage.setItem("access_token", data.access)
             localStorage.setItem("refresh_token", data.refresh)
-            
+
+            // Update axios default headers
             axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`
             
-            dispatch(authRegisterSlice({
+            // Dispatch login action
+            dispatch(
+                login({
+                    name: data.name,
+                    email: data.email,
+                    userType: data.user_type,
+                    phone: data.phone || '',
+                    accessToken: data.access,
+                    refreshToken: data.refresh
+                })
+            )
+            
+            // Store user info in local storage
+            localStorage.setItem('user', JSON.stringify({
                 name: data.name,
                 email: data.email,
-                phone: data.phone,
                 userType: data.user_type,
+                phone: data.phone || '',
                 accessToken: data.access,
                 refreshToken: data.refresh,
                 islogged: true
             }))
             
-            localStorage.setItem('user', JSON.stringify({
-                name: data.name,
-                email: data.email,
-                phone: data.phone,
-                userType: data.user_type,
-                accessToken: data.access,
-                refreshToken: data.refresh,
-                islogged: true
-            }));
-            
+            // Remove pending registration from session storage
             sessionStorage.removeItem("pendingRegistration")
             
-            alert("Account created successfully!")
-            
-            navigate('/home')
+            // Redirect based on user type
+            switch(data.user_type) {
+                case 'admin':
+                    navigate("/admin/dashboard")
+                    break
+                case 'barber':
+                    navigate("/barber/dashboard")
+                    break
+                default:
+                    navigate("/home")
+            }
         } catch (err) {
             console.error("Error during verification/registration:", err)
     
             if (err.response && err.response.data) {
-                console.log("Error details:", err.response.data)
-                
                 if (err.response.data.details) {
                     setError(
                         Object.entries(err.response.data.details)
@@ -141,8 +143,6 @@ function OtpVerifyPage() {
             setError('')
             setSuccess('')
             
-            console.log("Resending OTP to:", email)
-            
             const { data } = await axios.post(
                 "http://localhost:8000/resend-otp/",
                 { email },
@@ -153,7 +153,6 @@ function OtpVerifyPage() {
                 }
             )
             
-            console.log("Resend OTP response:", data)
             setSuccess("OTP resent successfully!")
             alert("OTP resent successfully!")
         } catch (err) {

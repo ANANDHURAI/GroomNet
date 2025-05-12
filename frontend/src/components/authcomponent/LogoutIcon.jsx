@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { logout } from "../../slices/authSlices/authLogoutSlice";
 
-const Logout = ({ buttonStyle }) => {
+const LogoutIcon = () => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,9 +17,6 @@ const Logout = ({ buttonStyle }) => {
       ? state.authAdminLogin
       : { isAdmin: false, refreshToken: "" }
   );
-  
-  const defaultButtonStyle = "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded";
-  const buttonClassName = buttonStyle || defaultButtonStyle;
 
   const handleLogout = async () => {
     if (isLoading) return; // Prevent multiple clicks
@@ -75,12 +72,20 @@ const Logout = ({ buttonStyle }) => {
   return (
     <button
       onClick={handleLogout}
+      className="text-gray-600 hover:text-gray-900 focus:outline-none"
+      title="Logout"
       disabled={isLoading}
-      className={`${buttonClassName} ${isLoading ? "opacity-70 cursor-not-allowed" : ""}`}
     >
-      {isLoading ? "Logging out..." : "Logout"}
+      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+        />
+      </svg>
     </button>
   );
 };
 
-export default Logout;
+export default LogoutIcon;
