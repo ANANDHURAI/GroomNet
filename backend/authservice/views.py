@@ -1,22 +1,24 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from .serializers import RegisterSerializer, OTPVerificationSerializer ,CreateUserSerializer ,CustomTokenObtainPairSerializer
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from .serializers import RegisterSerializer, OTPVerificationSerializer, CreateUserSerializer, CustomTokenObtainPairSerializer
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 import random
 from django.core.cache import cache
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from django.contrib.auth import authenticate
-from.models import CustomerModel
+from .models import User  # Changed from CustomerModel to User
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt , ensure_csrf_cookie
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 import logging
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class HomeView(APIView):
@@ -49,37 +51,35 @@ class SendOTP:
             return True
         except Exception as e:
             print(f"Error in SendOTP.send: {str(e)}")
-            # During development, don't fail the registration just because email sending failed
-            return True  # Return True to allow registration to continue
-
+            return True 
+        
 class RegisterView(APIView):
     def post(self, request):
         email = request.data.get("email")
         
-        # Debug print to see what data is coming in
+        
         print(f"Registration data received: {request.data}")
         
-        # Check if user already exists with this email
-        if CustomerModel.objects.filter(email=email).exists():
+        
+        if User.objects.filter(email=email).exists():
             return Response({"error": "Email already registered"}, status=400)
         
         serializer = RegisterSerializer(data=request.data)
         if not serializer.is_valid():
-            # Return detailed validation errors
+            
             return Response({"error": "Validation failed", "details": serializer.errors}, status=400)
         
         registration_data = request.data
-        cache.set(f"registration_{email}", registration_data, timeout=600)  # 10 minutes timeout
+        cache.set(f"registration_{email}", registration_data, timeout=600)  
         
-        # Generate and send OTP
+        
         otp = random.randint(1000, 9999)
-        cache.set(f"otp_{email}", str(otp), timeout=300)  # 5 minutes timeout
+        cache.set(f"otp_{email}", str(otp), timeout=300)  
         
-        # For debugging, print OTP to console (remove in production)
         print(f"Generated OTP for {email}: {otp}")
         
         try:
-            # Send OTP - Use the modified SendOTP class
+        
             result = SendOTP.send(email=email, otp=otp)
             
             if result:
@@ -92,8 +92,6 @@ class RegisterView(APIView):
                 
         except Exception as e:
             print(f"Failed to send OTP: {str(e)}")
-            # During development, instead of failing, continue the flow
-            # This lets you test the registration process even if email sending fails
             print(f"DEV MODE: Continuing despite email error. Use OTP: {otp}")
             return Response({
                 "message": "OTP generated for verification (check server logs).",
@@ -121,26 +119,23 @@ class VerifyOTPView(APIView):
         if cached_otp != otp:
             return Response({"error": "Invalid OTP."}, status=400)
 
-        # Mark email as verified in cache
-        cache.set(f"verified_{email}", True, timeout=600)  # 10 minutes timeout
+        cache.set(f"verified_{email}", True, timeout=600) 
         
         return Response({"message": "OTP verified successfully."}, status=200)
+
+
 
 
 class CreateUserView(APIView):
     def post(self, request):
         email = request.data.get("email")
-        
-        # Debug logging to see what data is coming in
         print(f"Create user request data: {request.data}")
         
-        # Check if email was verified
         verified = cache.get(f"verified_{email}")
         if not verified:
             print(f"Email verification check failed for {email}")
             return Response({"error": "Email not verified. Please verify OTP first."}, status=400)
             
-        # Get registration data from cache
         registration_data = cache.get(f"registration_{email}")
         if not registration_data:
             print(f"Registration data not found in cache for {email}")
@@ -148,17 +143,13 @@ class CreateUserView(APIView):
         
         print(f"Registration data from cache: {registration_data}")
         
-        # Merge the registration data with any additional data from the request
-        # This ensures all necessary fields are present
         merged_data = {**registration_data}
         
-        # Explicitly convert the user_type field if needed
-        if 'user_type' in merged_data and not 'user_type' in request.data:
+        if 'user_type' in merged_data and 'user_type' not in request.data:
             merged_data['user_type'] = merged_data.get('user_type')
             
         print(f"Merged data for serializer: {merged_data}")
         
-        # Create the user with the merged data
         serializer = CreateUserSerializer(data=merged_data)
         if not serializer.is_valid():
             print(f"Serializer validation errors: {serializer.errors}")
@@ -166,10 +157,7 @@ class CreateUserView(APIView):
             
         user = serializer.save()
         
-        # Generate tokens
         refresh = RefreshToken.for_user(user)
-        
-        # Clear cache
         cache.delete(f"otp_{email}")
         cache.delete(f"verified_{email}")
         cache.delete(f"registration_{email}")
@@ -185,6 +173,7 @@ class CreateUserView(APIView):
         }, status=201)
 
 
+
 class ResendOTPView(APIView):
    
     def post(self, request):
@@ -192,14 +181,13 @@ class ResendOTPView(APIView):
         if not email:
             return Response({"error": "Email is required"}, status=400)
             
-        # Check if registration data exists
         registration_data = cache.get(f"registration_{email}")
         if not registration_data:
             return Response({"error": "Registration data not found. Please register again."}, status=400)
             
-        # Generate and send new OTP
+       
         otp = random.randint(1000, 9999)
-        cache.set(f"otp_{email}", str(otp), timeout=300)  # 5 minutes timeout
+        cache.set(f"otp_{email}", str(otp), timeout=300)
         
         SendOTP.send(email=email, otp=otp)
         
@@ -224,24 +212,25 @@ class LogoutView(APIView):
 
 logger = logging.getLogger(__name__)
 
-@method_decorator(ensure_csrf_cookie, name='dispatch')
-class GetCSRFToken(APIView):
-    """
-    This view sets a CSRF cookie for the client
-    """
-    def get(self, request):
-        return JsonResponse({"success": "CSRF cookie set"})
 
-@method_decorator(csrf_exempt, name='dispatch')
+    
+class CustomTokenView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+    
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super().post(request, *args, **kwargs)
+            return response
+        except Exception as e:
+            print(f"Token view error: {str(e)}")
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)
+        
+
 class AdminLoginView(APIView):
-    """
-    View for admin user login. 
-    Only allows login for users with is_staff=True
-    """
     permission_classes = [AllowAny]
     
     def post(self, request):
-        logger.info(f"Admin login attempt for email: {request.data.get('email', 'unknown')}")
+        
         
         email = request.data.get('email')
         password = request.data.get('password')
@@ -288,27 +277,9 @@ class AdminLoginView(APIView):
 
 
 class AdminDashboardView(APIView):
-    """
-    Protected dashboard view for admin users only
-    """
-    # The permission classes from your original code are fine for this view
-    # permission_classes = [IsAuthenticated, IsAdminUser]
-    
     def get(self, request):
         return Response({
             'message': 'Welcome to Admin Dashboard',
             'user': request.user.email,
             'is_superuser': request.user.is_superuser,
         })
-
-    
-class CustomTokenView(TokenObtainPairView):
-    serializer_class = CustomTokenObtainPairSerializer
-    
-    def post(self, request, *args, **kwargs):
-        try:
-            response = super().post(request, *args, **kwargs)
-            return response
-        except Exception as e:
-            print(f"Token view error: {str(e)}")
-            return Response({"error": "Invalid credentials"}, status=status.HTTP_401_UNAUTHORIZED)

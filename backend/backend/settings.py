@@ -159,7 +159,7 @@ CSRF_COOKIE_HTTPONLY = False
 CSRF_USE_SESSIONS = False
 
 
-AUTH_USER_MODEL = 'authservice.CustomerModel'
+AUTH_USER_MODEL = 'authservice.User'
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     

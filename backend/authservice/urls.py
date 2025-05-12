@@ -3,14 +3,13 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import(
     HomeView, 
     RegisterView,
-    LogoutView ,
-    VerifyOTPView ,
-    AdminDashboardView , 
-    AdminLoginView ,
+    LogoutView,
+    VerifyOTPView,
+    AdminDashboardView, 
+    AdminLoginView,
     RegisterView, 
     CreateUserView,
-    ResendOTPView ,
-    GetCSRFToken
+    ResendOTPView,
 )
 from .serializers import CustomTokenObtainPairSerializer
 
@@ -29,7 +28,6 @@ urlpatterns = [
     path('resend-otp/', ResendOTPView.as_view(), name='resend_otp'),
 
     path('aadmin/login/', AdminLoginView.as_view(), name='admin_login'),
-    path('get-csrf-token/', GetCSRFToken.as_view(), name='get-csrf-token'),
     path('admin/dashboard/', AdminDashboardView.as_view(), name='admin_dashboard'),
     
 ]
