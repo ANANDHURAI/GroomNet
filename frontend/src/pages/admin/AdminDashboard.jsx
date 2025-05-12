@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { logout } from '../../slices/authSlice';
-import apiClient from '../../slices/axiosInterceptor';
+import { authLogoutSlice } from '../../slices/authSlices/authLogoutSlice';
+import apiClient from '../../slices/api/apiClient';
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   }, []);
   
   const handleLogout = () => {
-    dispatch(logout());
+    dispatch(authLogoutSlice());
     navigate('/admin/login');
   };
   

@@ -1,8 +1,17 @@
-import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "../slices/authSlice";
+import { configureStore } from '@reduxjs/toolkit';
+import authAdminLoginReducer from '../slices/authSlices/authAdminLoginSlice';
+import authRegisterReducer from '../slices/authSlices/authRegisterSlice';
+import authLogoutReducer from '../slices/authSlices/authLogoutSlice';
+import authLoginReducer from '../slices/authSlices/authLoginSlice';
+import authTokenUpdateReducer from '../slices/authSlices/authTokenUpdateSlice';
+
 
 export const store = configureStore({
-    reducer: {
-        auth: authReducer,
-    },
-})
+  reducer: {
+    authRegister: authRegisterReducer,
+    authLogin: authLoginReducer,
+    authAdminLogin: authAdminLoginReducer,
+    authLogout: authLogoutReducer,
+    authTokenUpdate: authTokenUpdateReducer,
+  },
+});

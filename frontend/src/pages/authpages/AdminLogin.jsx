@@ -2,8 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { adminLogin } from '../../slices/authSlice';
-import apiClient from '../../slices/axiosInterceptor';
+import { authAdminLoginSlice } from '../../slices/authSlices/authAdminLoginSlice';
 
 const AdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -78,7 +77,7 @@ const AdminLogin = () => {
         localStorage.setItem('refresh_token', refresh);
       }
       
-      dispatch(adminLogin({
+      dispatch(authAdminLoginSlice({
         name: userData.name,
         email: userData.email,
         accessToken: access,

@@ -6,7 +6,8 @@ import { LogoutIcon } from "../authcomponent/Logout";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { islogged, name, isAdmin } = useSelector((state) => state.auth);
+  const { islogged, name, isAdmin } = useSelector((state) => state.authAdminLogin || {});
+
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

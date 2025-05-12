@@ -2,7 +2,8 @@ import axios from 'axios'
 import React, { useState, useEffect } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { register } from '../../slices/authSlice'
+import { authRegisterSlice } from '../../slices/authSlices/authRegisterSlice'
+
 
 function OtpVerifyPage() {
     const [otp, setOtp] = useState('')
@@ -76,7 +77,7 @@ function OtpVerifyPage() {
             
             axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`
             
-            dispatch(register({
+            dispatch(authRegisterSlice({
                 name: data.name,
                 email: data.email,
                 phone: data.phone,

@@ -1,9 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
-import { login } from "../../slices/authSlice";
 import { useNavigate, Link } from "react-router-dom";
-
+import { authLoginSlice } from "../../slices/authSlices/authLoginSlice";
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,7 +38,7 @@ const Login = () => {
       
      
       dispatch(
-        login({
+        authLoginSlice({
           name: data.name,
           email: data.email,
           userType: data.user_type,

@@ -8,7 +8,7 @@ import Navbar from "../../components/navbarcomponent/Navbar";
 const Home = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const { name, userType } = useSelector((state) => state.auth);
+  const { name, userType } = useSelector((state) => state.authLogin);
 
   useEffect(() => {
     const fetchHomeData = async () => {

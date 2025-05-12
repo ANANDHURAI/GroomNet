@@ -3,13 +3,20 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { logout } from "../../slices/authSlice";
+import { authLogoutSlice } from "../../slices/authSlices/authLogoutSlice";
 
 const Logout = ({ buttonStyle }) => {
   const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAdmin, refreshToken } = useSelector(state => state.auth);
+  const { isAdmin, refreshToken } = useSelector((state) =>
+  state.authLogin?.islogged
+    ? state.authLogin
+    : state.authAdminLogin?.islogged
+    ? state.authAdminLogin
+    : { isAdmin: false, refreshToken: "" }
+);
+
   
   // Default button styles if none provided
   const defaultButtonStyle = "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded";
@@ -39,7 +46,7 @@ const Logout = ({ buttonStyle }) => {
       localStorage.removeItem("user");
       
       // Dispatch logout action to clear Redux state
-      dispatch(logout());
+      dispatch(authLogoutSlice());
       
       // Redirect based on user type
       if (isAdmin) {
@@ -55,7 +62,7 @@ const Logout = ({ buttonStyle }) => {
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
       
-      dispatch(logout());
+      dispatch(authLogoutSlice());
       navigate("/login");
     } finally {
       setIsLoading(false);
@@ -96,7 +103,7 @@ const LogoutIcon = () => {
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
       
-      dispatch(logout());
+      dispatch(authLogoutSlice());
       
       if (isAdmin) {
         navigate("/admin/login");
