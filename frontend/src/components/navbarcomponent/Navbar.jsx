@@ -1,4 +1,4 @@
-// Navbar.jsx
+
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -25,7 +25,7 @@ const Navbar = () => {
             </div>
           </div>
 
-          {/* Desktop navigation */}
+          
           <div className="hidden md:flex items-center space-x-4">
             {islogged ? (
               <>
@@ -68,7 +68,7 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile menu button */}
+          
           <div className="flex items-center md:hidden">
             <button
               onClick={toggleMenu}
@@ -76,7 +76,7 @@ const Navbar = () => {
               aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
-              {/* Icon when menu is closed */}
+              
               <svg
                 className={`${isMenuOpen ? "hidden" : "block"} h-6 w-6`}
                 xmlns="http://www.w3.org/2000/svg"
@@ -92,7 +92,7 @@ const Navbar = () => {
                   d="M4 6h16M4 12h16M4 18h16"
                 />
               </svg>
-              {/* Icon when menu is open */}
+              
               <svg
                 className={`${isMenuOpen ? "block" : "hidden"} h-6 w-6`}
                 xmlns="http://www.w3.org/2000/svg"
@@ -113,7 +113,7 @@ const Navbar = () => {
         </div>
       </div>
 
-      {/* Mobile menu, show/hide based on menu state */}
+      
       <div className={`${isMenuOpen ? "block" : "hidden"} md:hidden`}>
         <div className="pt-2 pb-3 space-y-1">
           {islogged ? (

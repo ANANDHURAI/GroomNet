@@ -1,4 +1,3 @@
-// Logout.jsx
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -18,7 +17,6 @@ const Logout = ({ buttonStyle }) => {
 );
 
   
-  // Default button styles if none provided
   const defaultButtonStyle = "bg-red-600 hover:bg-red-700 text-white font-medium py-2 px-4 rounded";
   const buttonClassName = buttonStyle || defaultButtonStyle;
 
@@ -26,7 +24,7 @@ const Logout = ({ buttonStyle }) => {
     setIsLoading(true);
     
     try {
-      // Call the backend logout endpoint to blacklist the token
+      
       await axios.post(
         "http://localhost:8000/logout/",
         { refresh_token: refreshToken },
@@ -37,18 +35,18 @@ const Logout = ({ buttonStyle }) => {
         }
       );
       
-      // Clear axios default authorization header
+      
       axios.defaults.headers.common["Authorization"] = null;
       
-      // Clear localStorage
+      
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
       
-      // Dispatch logout action to clear Redux state
+      
       dispatch(authLogoutSlice());
       
-      // Redirect based on user type
+      
       if (isAdmin) {
         navigate("/admin/login");
       } else {
@@ -57,7 +55,7 @@ const Logout = ({ buttonStyle }) => {
     } catch (error) {
       console.error("Logout error:", error);
       
-      // Even if the server-side logout fails, still clear client-side state
+      
       localStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");
       localStorage.removeItem("user");
@@ -80,7 +78,7 @@ const Logout = ({ buttonStyle }) => {
   );
 };
 
-// LogoutIcon - Minimal version for navbar/header
+
 const LogoutIcon = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();

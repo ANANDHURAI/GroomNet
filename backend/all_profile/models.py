@@ -35,7 +35,7 @@ class AdminProfile(models.Model):
     def __str__(self):
         return f"Admin: {self.user.name}"
 
-# Signal to create appropriate profile based on user_type
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:

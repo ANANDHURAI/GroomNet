@@ -38,7 +38,7 @@ const apiClient = axios.create({
   withCredentials: true
 });
 
-// Request interceptor
+
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token');
@@ -58,7 +58,7 @@ apiClient.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-// Response interceptor
+
 apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {

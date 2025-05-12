@@ -16,6 +16,7 @@ const Home = () => {
         const { data } = await axios.get("http://localhost:8000/home/", {
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
         });
         

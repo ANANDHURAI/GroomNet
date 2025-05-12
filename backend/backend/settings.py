@@ -76,7 +76,6 @@ DATABASES = {
     }
 }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -160,6 +159,7 @@ CSRF_USE_SESSIONS = False
 
 
 AUTH_USER_MODEL = 'authservice.User'
+
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     
