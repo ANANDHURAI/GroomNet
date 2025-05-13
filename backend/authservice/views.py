@@ -1,7 +1,11 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from .serializers import RegisterSerializer, OTPVerificationSerializer, CreateUserSerializer, CustomTokenObtainPairSerializer
+from .serializers import (
+    RegisterSerializer, OTPVerificationSerializer, 
+    CreateUserSerializer, CustomTokenObtainPairSerializer ,
+    ForgotPasswordSerializer, ResetPasswordSerializer
+)
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
@@ -32,9 +36,7 @@ class SendOTP:
     def send(email, otp):
         try:
             print(f"DEV MODE: OTP for {email}: {otp}")
-            
-            
-           
+        
             subject = 'GroomNet - Email Verification OTP'
             message = f'Your OTP for email verification is: {otp}'
             email_from = settings.EMAIL_HOST_USER
@@ -283,3 +285,73 @@ class AdminDashboardView(APIView):
             'user': request.user.email,
             'is_superuser': request.user.is_superuser,
         })
+    
+
+User = get_user_model()
+def send_otp(email, otp):
+    try:
+        subject = 'Password Reset OTP'
+        message = f'Your OTP for resetting the password is: {otp}'
+        email_from = settings.EMAIL_HOST_USER
+        recipient_list = [email]
+        
+        send_mail(
+            subject,
+            message,
+            email_from,
+            recipient_list,
+            fail_silently=False
+        )
+        return True
+    except Exception as e:
+        print(f"Error in sending OTP: {str(e)}")
+        return False
+
+
+class ForgotPasswordView(APIView):
+    def post(self, request):
+        serializer = ForgotPasswordSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        email = serializer.validated_data['email']
+    
+        if not User.objects.filter(email=email).exists():
+            return Response({"error": "Email not found"}, status=status.HTTP_404_NOT_FOUND)
+
+        otp = random.randint(1000, 9999)
+        cache.set(f"otp_{email}", str(otp), timeout=300)  
+
+        
+        if send_otp(email, otp):
+            return Response({
+                "message": "OTP sent to your email for password reset.",
+                "email": email
+            }, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "Failed to send OTP"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ResetPasswordView(APIView):
+    def post(self, request):
+        serializer = ResetPasswordSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        email = serializer.validated_data['email']
+        otp = serializer.validated_data['otp']
+        new_password = serializer.validated_data['new_password']
+
+        cached_otp = cache.get(f"otp_{email}")
+        if not cached_otp:
+            return Response({"error": "OTP expired. Please request a new OTP."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if cached_otp != otp:
+            return Response({"error": "Invalid OTP."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = User.objects.get(email=email)
+        user.set_password(new_password)
+        user.save()
+        cache.delete(f"otp_{email}")
+        
+        return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)

@@ -109,7 +109,7 @@ const Login = () => {
             />
           </div>
           
-          <div className="mb-6">
+          <div className="mb-2">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
               Password
             </label>
@@ -125,9 +125,18 @@ const Login = () => {
             />
           </div>
           
+          <div className="mb-6 text-center">
+            <Link 
+              to="/forgot" 
+              className="text-sm text-blue-600 hover:text-blue-800 transition duration-200 ease-in-out"
+            >
+              Forgot Password?
+            </Link>
+          </div>
+          
           <div className="flex flex-col space-y-4">
             <button
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full transition duration-200 ease-in-out transform hover:scale-105"
               type="submit"
               disabled={loading}
             >

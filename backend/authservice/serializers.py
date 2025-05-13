@@ -47,3 +47,11 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
             'phone': getattr(self.user, 'phone', ''),
         })
         return data
+    
+class ForgotPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+class ResetPasswordSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    otp = serializers.CharField(max_length=4)
+    new_password = serializers.CharField(write_only=True, min_length=6)

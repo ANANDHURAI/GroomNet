@@ -12,6 +12,8 @@ import BarberHome from './pages/barber/BarberHome';
 import BarberProfilePage from './pages/profiles/BarberProfilePage';
 import CustomerProfilePage from './pages/profiles/CustomerProfilePage';
 import AdminProfilePage from './pages/profiles/AdminProfilePage';
+import ForgotPassword from './pages/authpages/ForgotPassword';
+import ResetPassword from './pages/authpages/ResetPassword';
 
 function App() {
   const dispatch = useDispatch();
@@ -28,6 +30,8 @@ function App() {
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/aadmin/login" element={<AdminLogin />} />
         <Route path="/otp" element={<OtpVerifyPage />} />
+        <Route path="/forgot" element={<ForgotPassword />} />
+        <Route path="/reset" element={<ResetPassword />} />
         
         {/* Default Route */}
         <Route path="/" element={<Navigate to="/home" replace />} />

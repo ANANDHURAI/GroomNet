@@ -8,6 +8,7 @@ import authTokenUpdateReducer from '../slices/authSlices/authTokenUpdateSlice';
 import barberProfileReducer from '../slices/profile/barberProfile/barberProfileSlice';
 import customerProfileReducer from '../slices/profile/customerProfile/customerProfileSlice';
 import adminProfileReducer from '../slices/profile/adminProfile/adminProfileSlice';
+import authForgotReducer from '../slices/authSlices/authForgotSlice';
 
 export const store = configureStore({
   reducer: {
@@ -19,6 +20,7 @@ export const store = configureStore({
     barberProfile: barberProfileReducer,
     customerProfile: customerProfileReducer,
     adminProfile: adminProfileReducer,
+    authForgot: authForgotReducer,
   },
 });
 

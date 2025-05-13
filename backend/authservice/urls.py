@@ -10,6 +10,8 @@ from .views import(
     RegisterView, 
     CreateUserView,
     ResendOTPView,
+    ResetPasswordView,
+    ForgotPasswordView    
 )
 from .serializers import CustomTokenObtainPairSerializer
 
@@ -29,5 +31,8 @@ urlpatterns = [
 
     path('aadmin/login/', AdminLoginView.as_view(), name='admin_login'),
     path('admin/dashboard/', AdminDashboardView.as_view(), name='admin_dashboard'),
+
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot_password'),
+    path('reset-password/', ResetPasswordView.as_view(), name='reset_password'),
     
 ]
