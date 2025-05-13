@@ -1,24 +1,64 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import LogoutIcon from "../authcomponent/LogoutIcon";
+import axios from "axios";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  
+  const [profileImage, setProfileImage] = useState(null);
 
-  const authInfo = useSelector((state) => 
-    state.authLogin?.islogged 
-      ? state.authLogin 
-      : state.authAdminLogin?.islogged 
-      ? state.authAdminLogin 
+  const authInfo = useSelector((state) =>
+    state.authLogin?.islogged
+      ? state.authLogin
+      : state.authAdminLogin?.islogged
+      ? state.authAdminLogin
       : { islogged: false, name: "", isAdmin: false }
   );
-  
-  const { islogged, name, isAdmin } = authInfo;
+
+  const { islogged, name, isAdmin, accessToken, userType } = authInfo;
+
+  useEffect(() => {
+    const fetchProfileImage = async () => {
+      if (!accessToken || !userType) return;
+      
+      try {
+        const endpoint = userType === "customer" 
+          ? "http://localhost:8000/profile/customer/profile" 
+          : userType === "barber"
+          ? "http://localhost:8000/profile/barber/profile"
+          : isAdmin
+          ? "http://localhost:8000/profile/admin/profile"
+          : null;
+          
+        if (!endpoint) return;
+        
+        const { data } = await axios.get(endpoint, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
+        setProfileImage(data.profile_image);
+      } catch (error) {
+        console.error(`Error fetching profile image:`, error);
+      }
+    };
+
+    if (islogged) {
+      fetchProfileImage();
+    }
+  }, [accessToken, userType, islogged, isAdmin]); // Added isAdmin as a dependency
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  // Determine profile link based on user type
+  const getProfileLink = () => {
+    if (userType === "customer") return "/profile/customer";
+    if (userType === "barber") return "/profile/barber";
+    if (isAdmin) return "/profile/admin";
+    return "/login";
   };
 
   return (
@@ -38,21 +78,39 @@ const Navbar = () => {
             {islogged ? (
               <>
                 {isAdmin ? (
-                  <Link
-                    to="/admin/dashboard"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Dashboard
-                  </Link>
+                  <>
+                    <Link
+                      to="/admin/dashboard"
+                      className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link to="/profile/admin">
+                      <img
+                        src={profileImage || "/default-profile.png"}
+                        alt="Admin Profile"
+                        className="w-8 h-8 rounded-full border border-gray-300 object-cover hover:scale-105 transition-transform"
+                      />
+                    </Link>
+                  </>
                 ) : (
-                  <Link
-                    to="/home"
-                    className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
-                  >
-                    Home
-                  </Link>
+                  <>
+                    <Link
+                      to="/home"
+                      className="text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium"
+                    >
+                      Home
+                    </Link>
+                    <Link to={getProfileLink()}>
+                      <img
+                        src={profileImage || "/default-profile.png"}
+                        alt="Profile"
+                        className="w-8 h-8 rounded-full border border-gray-300 object-cover hover:scale-105 transition-transform"
+                      />
+                    </Link>
+                  </>
                 )}
-                
+
                 <div className="flex items-center space-x-2">
                   <span className="text-gray-700 font-medium">{name}</span>
                   <LogoutIcon />
@@ -93,12 +151,7 @@ const Navbar = () => {
                 stroke="currentColor"
                 aria-hidden="true"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
               </svg>
               {/* Icon when menu is open */}
               <svg
@@ -109,39 +162,52 @@ const Navbar = () => {
                 stroke="currentColor"
                 aria-hidden="true"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M6 18L18 6M6 6l12 12"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile menu, show/hide based on menu state */}
+      {/* Mobile menu */}
       <div className={`${isMenuOpen ? "block" : "hidden"} md:hidden`}>
         <div className="pt-2 pb-3 space-y-1">
           {islogged ? (
             <>
               {isAdmin ? (
-                <Link
-                  to="/admin/dashboard"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    to="/admin/dashboard"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link to="/profile/admin" className="block px-3 py-2">
+                    <img
+                      src={profileImage || "/default-profile.png"}
+                      alt="Admin Profile"
+                      className="w-8 h-8 rounded-full border border-gray-300 object-cover"
+                    />
+                  </Link>
+                </>
               ) : (
-                <Link
-                  to="/home"
-                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
-                >
-                  Home
-                </Link>
+                <>
+                  <Link
+                    to="/home"
+                    className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
+                  >
+                    Home
+                  </Link>
+                  <Link to={getProfileLink()} className="block px-3 py-2">
+                    <img
+                      src={profileImage || "/default-profile.png"}
+                      alt="Profile"
+                      className="w-8 h-8 rounded-full border border-gray-300 object-cover"
+                    />
+                  </Link>
+                </>
               )}
-              
+
               <div className="flex items-center justify-between px-3 py-2">
                 <span className="text-gray-700 font-medium">{name}</span>
                 <LogoutIcon />

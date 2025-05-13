@@ -9,9 +9,9 @@ import Home from './pages/common/Home';
 import RegisterPage from './pages/authpages/RegisterPage';
 import OtpVerifyPage from './pages/authpages/Otpverifypage';
 import BarberHome from './pages/barber/BarberHome';
-import BarberProfilePage from './pages/profile/BarberProfilePage';
-import CustomerProfilePage from './pages/profile/CustomerProfilePage';
-import AdminProfilePage from './pages/profile/AdminProfilePage';
+import BarberProfilePage from './pages/profiles/BarberProfilePage';
+import CustomerProfilePage from './pages/profiles/CustomerProfilePage';
+import AdminProfilePage from './pages/profiles/AdminProfilePage';
 
 function App() {
   const dispatch = useDispatch();

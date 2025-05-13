@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import apiClient from '../../authApiClient';
+import apiClient from '../../api/apiClient';
 
 const fetchAdminProfile = createAsyncThunk(
   'adminProfile/fetch',

@@ -1,10 +1,33 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/navbarcomponent/Navbar";
-import { Logout } from "../../components/authcomponent/Logout";
+import Logout from "../../components/authcomponent/Logout";
 
 function BarberHome() {
-  const { name, email } = useSelector((state) => state.auth);
+  const navigate = useNavigate();
+  
+  // Access the auth state from your Redux store structure
+  const auth = useSelector((state) => state.authLogin);
+  const { islogged, name, email, userType } = auth || {};
+
+  // Check if user is authenticated and is a barber
+  useEffect(() => {
+    if (!islogged) {
+      navigate("/login");
+    } else if (userType !== "barber") {
+      // Redirect to appropriate page if not a barber
+      navigate("/home");
+    }
+  }, [islogged, userType, navigate]);
+
+  if (!islogged) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-700 text-lg">Loading profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

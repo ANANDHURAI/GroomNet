@@ -12,7 +12,17 @@ import { Navigate } from 'react-router-dom';
 const BarberProfilePage = () => {
   const dispatch = useDispatch();
   const { profile, loading, error } = useSelector(state => state.barberProfile);
-  const { islogged, userType } = useSelector(state => state.auth);
+  
+  // Fix: Get auth info from the correct Redux state slices
+  const authInfo = useSelector((state) =>
+    state.authLogin?.islogged
+      ? state.authLogin
+      : state.authAdminLogin?.islogged
+      ? state.authAdminLogin
+      : { islogged: false, userType: null }
+  );
+  
+  const { islogged, userType } = authInfo;
   
   const [isEditing, setIsEditing] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -24,7 +34,6 @@ const BarberProfilePage = () => {
   });
   const [previewImage, setPreviewImage] = useState(null);
 
-  
   useEffect(() => {
     if (islogged) {
       dispatch(fetchBarberProfile());
