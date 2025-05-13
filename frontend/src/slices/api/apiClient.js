@@ -34,7 +34,7 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    // Removed CSRF token logic since it's not needed
+    
     
     return config;
   },

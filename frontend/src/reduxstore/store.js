@@ -9,6 +9,7 @@ import barberProfileReducer from '../slices/profile/barberProfile/barberProfileS
 import customerProfileReducer from '../slices/profile/customerProfile/customerProfileSlice';
 import adminProfileReducer from '../slices/profile/adminProfile/adminProfileSlice';
 import authForgotReducer from '../slices/authSlices/authForgotSlice';
+import customerReducer from '../slices/adminManagement/customer/customerSlice'
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +22,7 @@ export const store = configureStore({
     customerProfile: customerProfileReducer,
     adminProfile: adminProfileReducer,
     authForgot: authForgotReducer,
+    customers:customerReducer ,
   },
 });
 

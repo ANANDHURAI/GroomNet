@@ -14,6 +14,8 @@ import CustomerProfilePage from './pages/profiles/CustomerProfilePage';
 import AdminProfilePage from './pages/profiles/AdminProfilePage';
 import ForgotPassword from './pages/authpages/ForgotPassword';
 import ResetPassword from './pages/authpages/ResetPassword';
+import CustomerList from './pages/admin/CustomerList';
+
 
 function App() {
   const dispatch = useDispatch();
@@ -48,6 +50,9 @@ function App() {
         
         {/* Catch All Route */}
         <Route path="*" element={<Navigate to="/home" replace />} />
+
+        <Route path="/customers" element={<CustomerList />} />
+
       </Routes>
     </BrowserRouter>
   );

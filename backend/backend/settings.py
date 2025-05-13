@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'all_profile',
+    'admin_management',
 ]
 
 MIDDLEWARE = [

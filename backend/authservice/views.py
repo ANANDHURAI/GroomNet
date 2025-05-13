@@ -12,12 +12,10 @@ from django.core.mail import send_mail
 import random
 from django.core.cache import cache
 from django.contrib.auth import authenticate
-from .models import User  # Changed from CustomerModel to User
+from .models import User
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.conf import settings
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.utils.decorators import method_decorator
 from django.http import JsonResponse
 import logging
 from django.contrib.auth import get_user_model
