@@ -26,7 +26,7 @@ function App() {
         {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/aadmin/login" element={<AdminLogin />} />
         <Route path="/otp" element={<OtpVerifyPage />} />
         
         {/* Default Route */}

@@ -11,7 +11,6 @@ const updateCustomerProfile = createAsyncThunk(
         },
       };
 
-      // Optional: Debug formData if it's FormData
       if (formData instanceof FormData) {
         for (let pair of formData.entries()) {
           console.log(`FormData contains: ${pair[0]}: ${pair[1]}`);

@@ -18,18 +18,6 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
-const getCsrfToken = () => {
-  const name = 'csrftoken';
-  const cookies = document.cookie.split(';');
-  for (let cookie of cookies) {
-    const trimmedCookie = cookie.trim();
-    if (trimmedCookie.startsWith(name + '=')) {
-      return decodeURIComponent(trimmedCookie.substring(name.length + 1));
-    }
-  }
-  return null;
-};
-
 const apiClient = axios.create({
   baseURL:'http://localhost:8000',
   headers: {
@@ -46,12 +34,7 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
-    if (config.method !== 'get') {
-      const csrfToken = getCsrfToken();
-      if (csrfToken) {
-        config.headers['X-CSRFToken'] = csrfToken;
-      }
-    }
+    // Removed CSRF token logic since it's not needed
     
     return config;
   },

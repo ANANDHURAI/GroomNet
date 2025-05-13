@@ -1,19 +1,19 @@
-
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { authLogoutSlice } from '../../slices/authSlices/authLogoutSlice';
+import { logout } from '../../slices/authSlices/authLogoutSlice';
 import apiClient from '../../slices/api/apiClient';
+import AdminNavbar from '../../components/navbarcomponent/AdminNavbar';
 
 const AdminDashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { name, email, isSuperuser } = useSelector((state) => state.auth);
-  
+  const { name, email, isSuperuser } = useSelector((state) => state.authAdminLogin);
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
@@ -26,15 +26,15 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     };
-    
+
     fetchDashboardData();
   }, []);
-  
+
   const handleLogout = () => {
-    dispatch(authLogoutSlice());
-    navigate('/admin/login');
+    dispatch(logout());
+    navigate('/aadmin/login');
   };
-  
+
   if (loading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -42,38 +42,25 @@ const AdminDashboard = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 justify-between">
-            <div className="flex">
-              <div className="flex flex-shrink-0 items-center">
-                <h1 className="text-xl font-bold text-gray-800">Admin Dashboard</h1>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <div className="mr-4 text-right">
-                <p className="text-sm font-medium text-gray-900">{name}</p>
-                <p className="text-xs text-gray-500">{email}</p>
-                {isSuperuser && (
-                  <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
-                    Superuser
-                  </span>
-                )}
-              </div>
-              <button
-                onClick={handleLogout}
-                className="rounded-md bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700"
-              >
-                Logout
-              </button>
-            </div>
+    <AdminNavbar/>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 justify-between items-center">
+          <div className="text-xl font-bold text-gray-800">Admin Dashboard</div>
+          <div className="text-right">
+            <p className="text-sm font-medium text-gray-900">{name}</p>
+            <p className="text-xs text-gray-500">{email}</p>
+            {isSuperuser && (
+              <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                Superuser
+              </span>
+            )}
           </div>
         </div>
-      </nav>
-      
+      </div>
+
       <div className="mx-auto max-w-7xl py-6 sm:px-6 lg:px-8">
         {error ? (
           <div className="rounded-md bg-red-50 p-4">
@@ -87,14 +74,6 @@ const AdminDashboard = () => {
                 You are logged in as an admin user.
               </p>
               
-              {dashboardData && (
-                <div className="mt-4">
-                  <h3 className="text-md font-medium text-gray-900">Dashboard Information</h3>
-                  <pre className="mt-2 rounded bg-gray-100 p-4">
-                    {JSON.stringify(dashboardData, null, 2)}
-                  </pre>
-                </div>
-              )}
             </div>
           </div>
         )}

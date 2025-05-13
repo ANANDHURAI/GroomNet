@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../components/navbarcomponent/Navbar";
 import fetchCustomerProfile from "../../slices/profile/customerProfile/fetchCustomerProfile";
+import updateCustomerProfile from "../../slices/profile/customerProfile/updateCustomerProfile";
+import { clearErrors } from "../../slices/profile/customerProfile/customerProfileSlice";
 
 const CustomerProfilePage = () => {
   const dispatch = useDispatch();
@@ -10,6 +12,7 @@ const CustomerProfilePage = () => {
   const auth = useSelector((state) => state.authLogin);
   const { profile, loading, error } = useSelector((state) => state.customerProfile);
   const [isEditing, setIsEditing] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -31,6 +34,11 @@ const CustomerProfilePage = () => {
     }
     
     dispatch(fetchCustomerProfile());
+    
+    // Clear any previous errors
+    return () => {
+      dispatch(clearErrors());
+    };
   }, [auth, dispatch, navigate]);
 
   // Update form data when profile is loaded
@@ -62,10 +70,63 @@ const CustomerProfilePage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Implement profile update logic here with the profile update thunk
-    // For now just toggle editing mode
+    setIsSubmitting(true);
+    
+    // Create FormData object for file upload
+    const profileFormData = new FormData();
+    
+    // Only add fields that have values and have changed
+    if (formData.name !== profile.name) {
+      profileFormData.append("name", formData.name);
+    }
+    
+    if (formData.phone !== profile.phone) {
+      profileFormData.append("phone", formData.phone);
+    }
+    
+    if (formData.profile_image) {
+      profileFormData.append("profile_image", formData.profile_image);
+    }
+    
+    try {
+      // Only dispatch if there are changes to submit
+      if (profileFormData.entries().next().done === false) {
+        const resultAction = await dispatch(updateCustomerProfile(profileFormData));
+        
+        if (updateCustomerProfile.fulfilled.match(resultAction)) {
+          // Update successful
+          setIsEditing(false);
+        }
+      } else {
+        // No changes to save
+        setIsEditing(false);
+      }
+    } catch (error) {
+      console.error("Failed to update profile:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCancel = () => {
+    // Reset form data to original profile data
+    if (profile) {
+      setFormData({
+        name: profile.name || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        profile_image: null,
+      });
+      
+      if (profile.profile_image) {
+        setPreviewImage(profile.profile_image);
+      } else {
+        setPreviewImage(null);
+      }
+    }
+    
     setIsEditing(false);
   };
 
@@ -181,16 +242,18 @@ const CustomerProfilePage = () => {
                 <div className="flex justify-end space-x-3 mt-6">
                   <button
                     type="button"
-                    onClick={() => setIsEditing(false)}
+                    onClick={handleCancel}
+                    disabled={isSubmitting}
                     className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md text-sm font-medium"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
+                    disabled={isSubmitting}
                     className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-sm font-medium"
                   >
-                    Save
+                    {isSubmitting ? 'Saving...' : 'Save'}
                   </button>
                 </div>
               </form>
