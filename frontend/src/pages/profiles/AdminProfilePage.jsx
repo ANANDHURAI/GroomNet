@@ -25,24 +25,21 @@ const AdminProfilePage = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Check authentication
+ 
   useEffect(() => {
-    // If we don't have an access token, redirect to login
+    
     if (!accessToken) {
       navigate('/aadmin/login');
     }
   }, [accessToken, navigate]);
 
   useEffect(() => {
-    // Clear any existing errors when the component mounts
     dispatch(clearErrors());
     
-    // Fetch profile data
     dispatch(fetchAdminProfile())
       .unwrap()
       .catch(err => {
         console.error("Failed to fetch profile:", err);
-        // If we get a 401 or 403, redirect to login
         if (err?.response?.status === 401 || err?.response?.status === 403) {
           navigate('/aadmin/login');
         }
@@ -86,7 +83,7 @@ const AdminProfilePage = () => {
       data.append('bio', formData.bio);
     }
 
-    // Only proceed with the API call if there's data to update
+   
     const hasData = Array.from(data.entries()).length > 0;
     if (!hasData) {
       setIsEditing(false);
@@ -98,7 +95,7 @@ const AdminProfilePage = () => {
       .unwrap()
       .then(() => {
         setIsEditing(false);
-        // Re-fetch the profile to ensure we have the latest data
+        
         dispatch(fetchAdminProfile());
       })
       .catch((err) => {
@@ -116,11 +113,11 @@ const AdminProfilePage = () => {
       });
       setPreviewImage(profile.profile_image);
     }
-    // Clear any errors that might be showing
+   
     dispatch(clearErrors());
   };
 
-  // If not authenticated as admin, redirect to login
+  
   if (!accessToken) {
     return <Navigate to="/aadmin/login" replace />;
   }

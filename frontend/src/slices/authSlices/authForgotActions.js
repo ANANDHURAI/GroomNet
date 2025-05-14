@@ -6,7 +6,7 @@ import {
 } from './authForgotSlice';
 import axios from 'axios';
 
-// Action to request an OTP for password reset
+
 export const forgotPassword = (email) => async (dispatch) => {
   try {
     dispatch(startLoading());

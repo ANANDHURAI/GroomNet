@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useDispatch } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
@@ -12,9 +12,35 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('type') === 'admin') {
+      setError("Please use the admin login page for administrative access");
+    }
+  }, []);
+
+  const validateForm = () => {
+   
+    setError("");
+    
+  
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return false;
+    }
+    
+    return true;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
+    
+    
+    if (!validateForm()) {
+      return;
+    }
+    
     setLoading(true);
     
     try {
@@ -28,14 +54,21 @@ const Login = () => {
         }
       );
 
-      // Store tokens
+
+      if (data.user_type === 'admin') {
+        setError("Administrators must use the admin login portal");
+        setLoading(false);
+        return;
+      }
+
+     
       localStorage.setItem("access_token", data.access);
       localStorage.setItem("refresh_token", data.refresh);
 
-      // Update axios default headers
+    
       axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`;
       
-      // Dispatch login action
+
       dispatch(
         login({
           name: data.name,
@@ -47,7 +80,7 @@ const Login = () => {
         })
       );
       
-      // Store user info in local storage
+      
       localStorage.setItem('user', JSON.stringify({
         name: data.name,
         email: data.email,
@@ -58,11 +91,7 @@ const Login = () => {
         islogged: true
       }));
       
-      // Redirect based on user type
       switch(data.user_type) {
-        case 'admin':
-          navigate("/admin/dashboard");
-          break;
         case 'barber':
           navigate("/barber/home");
           break;
@@ -117,12 +146,15 @@ const Login = () => {
               className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
               id="password"
               type="password"
-              placeholder="Password"
+              placeholder="Password (min 6 characters)"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={loading}
               required
             />
+            {password && password.length < 6 && (
+              <p className="text-red-500 text-xs mt-1">Password must be at least 6 characters</p>
+            )}
           </div>
           
           <div className="mb-6 text-center">

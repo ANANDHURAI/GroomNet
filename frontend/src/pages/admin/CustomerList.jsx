@@ -12,11 +12,11 @@ export default function CustomerList() {
   const { accessToken } = useSelector(state => state.authTokenUpdate);
 
   useEffect(() => {
-    // Check if we have an access token before fetching
+  
     if (localStorage.getItem('access_token') || accessToken) {
       dispatch(fetchCustomers());
     } else {
-      // If no token, redirect to login
+      
       navigate('/aadmin/login');
     }
   }, [dispatch, navigate, accessToken]);
@@ -25,11 +25,10 @@ export default function CustomerList() {
     dispatch(toggleBlock(userId))
       .unwrap()
       .then(() => {
-        // Success feedback could be added here
       })
       .catch(error => {
         if (error.includes('Session expired') || error.includes('401')) {
-          // Handle session expired
+         
           navigate('/aadmin/login');
         }
       });
@@ -43,7 +42,7 @@ export default function CustomerList() {
       });
   };
 
-  // Handle loading state
+  
   if (status === 'loading' && !isRefreshing) {
     return (
       <div className="flex h-screen">
@@ -58,7 +57,7 @@ export default function CustomerList() {
     );
   }
 
-  // Handle error state
+ 
   if (status === 'failed') {
     return (
       <div className="flex h-screen">

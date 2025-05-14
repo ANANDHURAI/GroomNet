@@ -16,16 +16,16 @@ const ResetPassword = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    // Clear previous errors
+    
     setPasswordError('');
     
-    // Validate passwords match
+    
     if (newPassword !== confirmPassword) {
       setPasswordError("Passwords don't match");
       return;
     }
     
-    // Validate password strength
+    
     if (newPassword.length < 6) {
       setPasswordError("Password must be at least 6 characters long");
       return;
@@ -33,7 +33,7 @@ const ResetPassword = () => {
     
     dispatch(resetPassword(email, otp, newPassword));
     
-    // Redirect to login after successful password reset
+    
     if (successMessage) {
       setTimeout(() => {
         navigate('/login');

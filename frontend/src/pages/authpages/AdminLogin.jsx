@@ -16,7 +16,7 @@ const AdminLogin = () => {
   const { islogged, isAdmin } = useSelector((state) => state.authAdminLogin);
 
   useEffect(() => {
-    // Redirect if already logged in as admin
+    
     if (islogged && isAdmin) {
       navigate('/admin/dashboard');
     }

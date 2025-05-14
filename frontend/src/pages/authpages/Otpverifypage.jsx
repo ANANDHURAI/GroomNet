@@ -28,7 +28,7 @@ function OtpVerifyPage() {
         setSuccess('')
         
         try {
-            // Verify OTP
+           
             await axios.post(
                 "http://localhost:8000/verify-otp/", 
                 { email, otp },
@@ -39,7 +39,7 @@ function OtpVerifyPage() {
                 }
             )
             
-            // Get the pending registration data
+           
             const pendingRegistration = JSON.parse(sessionStorage.getItem("pendingRegistration"))
             
             if (!pendingRegistration) {
@@ -48,7 +48,7 @@ function OtpVerifyPage() {
                 return
             }
             
-            // Create user
+            
             const { data } = await axios.post(
                 "http://localhost:8000/create-user/",
                 {
@@ -62,14 +62,14 @@ function OtpVerifyPage() {
                 }
             )
             
-            // Store tokens
+          
             localStorage.setItem("access_token", data.access)
             localStorage.setItem("refresh_token", data.refresh)
 
-            // Update axios default headers
+            
             axios.defaults.headers.common["Authorization"] = `Bearer ${data.access}`
             
-            // Dispatch login action
+           
             dispatch(
                 login({
                     name: data.name,
@@ -81,7 +81,7 @@ function OtpVerifyPage() {
                 })
             )
             
-            // Store user info in local storage
+           
             localStorage.setItem('user', JSON.stringify({
                 name: data.name,
                 email: data.email,
@@ -92,10 +92,10 @@ function OtpVerifyPage() {
                 islogged: true
             }))
             
-            // Remove pending registration from session storage
+            
             sessionStorage.removeItem("pendingRegistration")
             
-            // Redirect based on user type
+            
             switch(data.user_type) {
                 case 'admin':
                     navigate("/admin/dashboard")

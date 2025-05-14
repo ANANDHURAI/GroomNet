@@ -52,7 +52,9 @@ function App() {
         <Route path="*" element={<Navigate to="/home" replace />} />
 
         <Route path="/customers" element={<CustomerList />} />
-
+        
+            
+         
       </Routes>
     </BrowserRouter>
   );

@@ -21,7 +21,7 @@ const CustomerProfilePage = () => {
   });
   const [previewImage, setPreviewImage] = useState(null);
 
-  // Check authentication and fetch profile
+ 
   useEffect(() => {
     if (!auth?.islogged) {
       navigate("/login");
@@ -35,13 +35,13 @@ const CustomerProfilePage = () => {
     
     dispatch(fetchCustomerProfile());
     
-    // Clear any previous errors
+  
     return () => {
       dispatch(clearErrors());
     };
   }, [auth, dispatch, navigate]);
 
-  // Update form data when profile is loaded
+  
   useEffect(() => {
     if (profile) {
       setFormData({
@@ -74,10 +74,10 @@ const CustomerProfilePage = () => {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Create FormData object for file upload
+    
     const profileFormData = new FormData();
     
-    // Only add fields that have values and have changed
+    
     if (formData.name !== profile.name) {
       profileFormData.append("name", formData.name);
     }
@@ -91,16 +91,16 @@ const CustomerProfilePage = () => {
     }
     
     try {
-      // Only dispatch if there are changes to submit
+
       if (profileFormData.entries().next().done === false) {
         const resultAction = await dispatch(updateCustomerProfile(profileFormData));
         
         if (updateCustomerProfile.fulfilled.match(resultAction)) {
-          // Update successful
+         
           setIsEditing(false);
         }
       } else {
-        // No changes to save
+       
         setIsEditing(false);
       }
     } catch (error) {
@@ -111,7 +111,7 @@ const CustomerProfilePage = () => {
   };
 
   const handleCancel = () => {
-    // Reset form data to original profile data
+   
     if (profile) {
       setFormData({
         name: profile.name || "",

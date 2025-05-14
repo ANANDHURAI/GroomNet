@@ -1,5 +1,6 @@
 import axios from 'axios';
-import store from '../../../reduxstore/store';
+
+import { store } from '../../../reduxstore/store';
 import { logout } from '../../authSlices/authLogoutSlice';
 import { updateTokens } from '../../authSlices/authTokenUpdateSlice';
 

@@ -7,16 +7,14 @@ import Logout from "../../components/authcomponent/Logout";
 function BarberHome() {
   const navigate = useNavigate();
   
-  // Access the auth state from your Redux store structure
   const auth = useSelector((state) => state.authLogin);
   const { islogged, name, email, userType } = auth || {};
-
-  // Check if user is authenticated and is a barber
+ 
   useEffect(() => {
     if (!islogged) {
       navigate("/login");
     } else if (userType !== "barber") {
-      // Redirect to appropriate page if not a barber
+      
       navigate("/home");
     }
   }, [islogged, userType, navigate]);

@@ -1,4 +1,4 @@
-# all_profile/urls.py
+
 from django.urls import path
 from .views import CustomerProfileView, BarberProfileView, AdminProfileView
 

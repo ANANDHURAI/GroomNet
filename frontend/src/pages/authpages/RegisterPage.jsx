@@ -17,30 +17,56 @@ function RegisterPage() {
     const navigate = useNavigate()
     const dispatch = useDispatch()
 
-    const handleSubmit = async (e) => {
-        e.preventDefault()
-        setLoading(true)
+    const validateForm = () => {
+       
         setError('')
 
-        // Front-end validations
+        
+        if (name.trim().length < 5) {
+            setError('Name must be at least 5 characters long')
+            return false
+        }
+
+        if (password.length < 6) {
+            setError('Password must be at least 6 characters long')
+            return false
+        }
+
+
         if (password !== confirmPassword) {
             setError('Passwords do not match')
-            setLoading(false)
-            return
+            return false
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         if (!emailRegex.test(email)) {
             setError('Please enter a valid email address')
-            setLoading(false)
-            return
+            return false
         }
 
+        
         if (!phone.trim()) {
             setError('Phone number is required')
-            setLoading(false)
+            return false
+        }
+
+        if (userType.toLowerCase() === 'admin') {
+            setError('Administrator accounts cannot be created through this portal')
+            return false
+        }
+
+        return true
+    }
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+        
+        
+        if (!validateForm()) {
             return
         }
+        
+        setLoading(true)
 
         try {
             const registrationData = { 
@@ -51,7 +77,7 @@ function RegisterPage() {
                 user_type: userType.toLowerCase()
             }
             
-            // Request OTP
+         
             const { data } = await axios.post(
                 "http://localhost:8000/register/",
                 registrationData,
@@ -62,10 +88,10 @@ function RegisterPage() {
                 }
             )
             
-            // Store pending registration data in session storage
+          
             sessionStorage.setItem("pendingRegistration", JSON.stringify(registrationData))
 
-            // Dispatch action to update register state
+           
             dispatch(register({
                 name,
                 email,
@@ -120,11 +146,14 @@ function RegisterPage() {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="name"
                             type="text"
-                            placeholder="Name"
+                            placeholder="Name (min 5 characters)"
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             required
                         />
+                        {name && name.trim().length < 5 && (
+                            <p className="text-red-500 text-xs mt-1">Name must be at least 5 characters</p>
+                        )}
                     </div>
 
                     <div className="mb-4">
@@ -180,11 +209,14 @@ function RegisterPage() {
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                             id="password"
                             type="password"
-                            placeholder="Password"
+                            placeholder="Password (min 6 characters)"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                        {password && password.length < 6 && (
+                            <p className="text-red-500 text-xs mt-1">Password must be at least 6 characters</p>
+                        )}
                     </div>
                     
                     <div className="mb-6">
@@ -200,6 +232,9 @@ function RegisterPage() {
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                         />
+                        {confirmPassword && password !== confirmPassword && (
+                            <p className="text-red-500 text-xs mt-1">Passwords do not match</p>
+                        )}
                     </div>
                     
                     <div className="flex flex-col space-y-4">

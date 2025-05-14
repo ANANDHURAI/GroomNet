@@ -13,7 +13,7 @@ const BarberProfilePage = () => {
   const dispatch = useDispatch();
   const { profile, loading, error } = useSelector(state => state.barberProfile);
   
-  // Fix: Get auth info from the correct Redux state slices
+ 
   const authInfo = useSelector((state) =>
     state.authLogin?.islogged
       ? state.authLogin
@@ -62,7 +62,7 @@ const BarberProfilePage = () => {
       profile_image: file
     });
     
-    // Create preview URL
+    
     const reader = new FileReader();
     reader.onloadend = () => {
       setPreviewImage(reader.result);
@@ -83,17 +83,17 @@ const BarberProfilePage = () => {
     setIsSubmitting(true);
     const data = new FormData();
     
-    // Only append the profile image if it's a File object (newly uploaded)
+    
     if (formData.profile_image instanceof File) {
       data.append('profile_image', formData.profile_image);
     }
     
-    // Append other fields
+  
     data.append('bio', formData.bio);
     data.append('travel_radius_km', formData.travel_radius_km);
     data.append('available_now', formData.available_now);
 
-    // Only dispatch if there are changes
+
     dispatch(updateBarberProfile(data))
       .unwrap()
       .then(() => {
@@ -117,12 +117,11 @@ const BarberProfilePage = () => {
     setPreviewImage(profile?.profile_image);
   };
 
-  // Redirect if not logged in
   if (!islogged) {
     return <Navigate to="/login" replace />;
   }
 
-  // If user is a customer, redirect to customer profile
+  
   if (userType === 'customer') {
     return <Navigate to="/profile/customer" replace />;
   }
